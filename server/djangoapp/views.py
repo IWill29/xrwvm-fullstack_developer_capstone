@@ -39,45 +39,45 @@ def login_user(request):
     return JsonResponse(data)
 
 
+@csrf_exempt
 def logout_request(request):
-
-    logout(request) # Terminate user session
-    data = {"userName":""} # Return empty username
-    return JsonResponse(data)
+    """
+    Logs out current user. Accepts GET or POST.
+    Returns JSON with status 200 on success.
+    """
+    try:
+        if request.method not in ("GET", "POST"):
+            return JsonResponse({"error": "Method not allowed"}, status=405)
+        logout(request)
+        logger.info("User logged out: %s", request.user or "anonymous")
+        return JsonResponse({"detail": "logged out"}, status=200)
+    except Exception:
+        logger.exception("Logout error")
+        return JsonResponse({"error": "server error"}, status=500)
 
 
 @csrf_exempt
 def registration(request):
-    context = {}
-
-    # Load JSON data from the request body
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    first_name = data['firstName']
-    last_name = data['lastName']
-    email = data['email']
-    username_exist = False
-    email_exist = False
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
     try:
-        # Check if user already exists
-        User.objects.get(username=username)
-        username_exist = True
-    except:
-        # If not, simply log this is a new user
-        logger.debug("{} is new user".format(username))
-
-    # If it is a new user
-    if not username_exist:
-        # Create user in auth_user table
-        user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name,password=password, email=email)
-        # Login the user and redirect to list page
+        data = json.loads(request.body.decode("utf-8"))
+        username = data.get("userName") or data.get("username")
+        password = data.get("password")
+        first = data.get("firstName", "")
+        last = data.get("lastName", "")
+        email = data.get("email", "")
+        if not username or not password:
+            return JsonResponse({"error":"username and password required"}, status=400)
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({"error":"user exists"}, status=400)
+        user = User.objects.create_user(username=username, password=password, email=email, first_name=first, last_name=last)
+        user.save()
         login(request, user)
-        data = {"userName":username,"status":"Authenticated"}
-        return JsonResponse(data)
-    else :
-        data = {"userName":username,"error":"Already Registered"}
-        return JsonResponse(data)
+        return JsonResponse({"userName": username}, status=201)
+    except Exception:
+        logger.exception("Registration error")
+        return JsonResponse({"error":"server error"}, status=500)
 
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships

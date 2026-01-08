@@ -21,35 +21,17 @@ const Register = () => {
 // Handle form submission
   const register = async (e) => {
     e.preventDefault();
-
-    let register_url = window.location.origin+"/djangoapp/register";
-
-// Send POST request to register endpoint
-    const res = await fetch(register_url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            "userName": userName,
-            "password": password,
-            "firstName":firstName,
-            "lastName":lastName,
-            "email":email
-        }),
+    const url = window.location.origin + "/djangoapp/registration/"; // trailing slash
+    const payload = { userName, password, email, firstName, lastName };
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
-
-    const json = await res.json();
-    if (json.status) {
-    // Save username in session and reload home
-        sessionStorage.setItem('username', json.userName);
-        window.location.href = window.location.origin;
-    }
-    else if (json.error === "Already Registered") {
-      alert("The user with same username is already registered");
-      window.location.href = window.location.origin;
-    }
-};
+    const data = await res.json();
+    if (res.ok) window.location.href = "/login";
+    else alert(data.error || "Registration failed");
+  };
 
   return(
     <div className="register_container" style={{width: "50%"}}>

@@ -18,6 +18,8 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.static import serve
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +30,13 @@ urlpatterns = [
     path('login/', TemplateView.as_view(template_name="index.html")),
     path('register/', TemplateView.as_view(template_name="index.html")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# serve PWA/static root files produced by React build
+urlpatterns += [
+    path('manifest.json', serve, {'path': 'manifest.json', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+    path('asset-manifest.json', serve, {'path': 'asset-manifest.json', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+    path('favicon.ico', serve, {'path': 'favicon.ico', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+    path('robots.txt', serve, {'path': 'robots.txt', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+    path('logo192.png', serve, {'path': 'logo192.png', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+    path('logo512.png', serve, {'path': 'logo512.png', 'document_root': os.path.join(settings.BASE_DIR, 'frontend', 'build')}),
+]
