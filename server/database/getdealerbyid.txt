@@ -1,0 +1,12 @@
+﻿curl.exe -i -X GET 'http://localhost:3030/fetchDealer/15'
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 228
+ETag: W/"e4-p9hCq+i2HxuMd2TMoMoR9p3M7Pc"
+Date: Sun, 11 Jan 2026 09:19:18 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"_id":"6963688ee3f23279c5fe93fc","id":15,"city":"San Antonio","state":"Texas","address":"5057 Pankratz Hill","zip":"78225","lat":"29.3875","long":"-98.5245","short_name":"Tempsoft","full_name":"Tempsoft Car Dealership","__v":0}
